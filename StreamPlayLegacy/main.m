@@ -253,6 +253,7 @@ static NSString * const SPLSourcesKey = @"SPLLegacy.sources.v1";
 }
 - (void)viewDidLoad {
     [super viewDidLoad]; self.title = @"Navegador"; self.view.backgroundColor = SPLBackground();
+    self.edgesForExtendedLayout = UIRectEdgeNone;
     WKWebViewConfiguration *config = [WKWebViewConfiguration new]; config.allowsInlineMediaPlayback = YES;
     config.allowsAirPlayForMediaPlayback = YES;
     _web = [[WKWebView alloc] initWithFrame:CGRectZero configuration:config];
@@ -320,24 +321,65 @@ static NSString * const SPLSourcesKey = @"SPLLegacy.sources.v1";
 }
 @end
 
+// iOS 12: avoid UITabBarSystemItemFavorites, which can override the tab title.
+// Simple template icons keep the three tabs readable on 4.7/5.5-inch screens.
+static UIImage *SPLTabIcon(NSUInteger kind) {
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(26, 26), NO, 0);
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    CGContextSetStrokeColorWithColor(ctx, UIColor.blackColor.CGColor);
+    CGContextSetFillColorWithColor(ctx, UIColor.blackColor.CGColor);
+    CGContextSetLineWidth(ctx, 1.8);
+    CGContextSetLineCap(ctx, kCGLineCapRound);
+    if (kind == 0) { // Canais: TV + play
+        [[UIBezierPath bezierPathWithRoundedRect:CGRectMake(2, 5, 22, 16) cornerRadius:3] stroke];
+        UIBezierPath *play = [UIBezierPath bezierPath];
+        [play moveToPoint:CGPointMake(10, 9)];
+        [play addLineToPoint:CGPointMake(10, 17)];
+        [play addLineToPoint:CGPointMake(17, 13)];
+        [play closePath];
+        [play fill];
+    } else if (kind == 1) { // Navegador: globe
+        [[UIBezierPath bezierPathWithOvalInRect:CGRectMake(3, 3, 20, 20)] stroke];
+        [[UIBezierPath bezierPathWithOvalInRect:CGRectMake(9, 3, 8, 20)] stroke];
+        CGContextMoveToPoint(ctx, 3, 13);
+        CGContextAddLineToPoint(ctx, 23, 13);
+        CGContextStrokePath(ctx);
+    } else { // CarPlay: car silhouette
+        UIBezierPath *car = [UIBezierPath bezierPath];
+        [car moveToPoint:CGPointMake(3, 11)];
+        [car addLineToPoint:CGPointMake(7, 6)];
+        [car addLineToPoint:CGPointMake(19, 6)];
+        [car addLineToPoint:CGPointMake(23, 11)];
+        [car addLineToPoint:CGPointMake(23, 19)];
+        [car addLineToPoint:CGPointMake(3, 19)];
+        [car closePath];
+        [car stroke];
+        [[UIBezierPath bezierPathWithOvalInRect:CGRectMake(6, 17, 4, 5)] fill];
+        [[UIBezierPath bezierPathWithOvalInRect:CGRectMake(16, 17, 4, 5)] fill];
+    }
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+}
+
 @interface SPLAppDelegate : UIResponder <UIApplicationDelegate>
 @property (nonatomic, strong) UIWindow *window;
 @end
 @implementation SPLAppDelegate
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    UIViewController *(^tab)(UIViewController *, NSString *, UITabBarSystemItem) = ^UIViewController *(UIViewController *vc, NSString *name, UITabBarSystemItem icon) {
+    UIViewController *(^tab)(UIViewController *, NSString *, NSUInteger) = ^UIViewController *(UIViewController *vc, NSString *name, NSUInteger iconKind) {
         UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
-        nav.tabBarItem = [[UITabBarItem alloc] initWithTabBarSystemItem:icon tag:0]; nav.tabBarItem.title = name;
+        nav.tabBarItem = [[UITabBarItem alloc] initWithTitle:name image:SPLTabIcon(iconKind) tag:iconKind];
         nav.navigationBar.barTintColor = SPLPanel(); nav.navigationBar.tintColor = SPLAccent();
         nav.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: UIColor.whiteColor};
         return nav;
     };
     UITabBarController *root = [UITabBarController new];
     root.viewControllers = @[
-        tab([SPLChannelsController new], @"Canais", UITabBarSystemItemFavorites),
-        tab([SPLBrowserController new], @"Navegador", UITabBarSystemItemBookmarks),
-        tab([SPLSettingsController new], @"CarPlay", UITabBarSystemItemMore)
+        tab([SPLChannelsController new], @"Canais", 0),
+        tab([SPLBrowserController new], @"Navegador", 1),
+        tab([SPLSettingsController new], @"CarPlay", 2)
     ];
     root.tabBar.barTintColor = SPLPanel(); root.tabBar.tintColor = SPLAccent();
     self.window.rootViewController = root; [self.window makeKeyAndVisible];

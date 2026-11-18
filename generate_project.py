@@ -15,9 +15,11 @@ main=ref('source.main')
 icon2=ref('resource.icon2')
 icon3=ref('resource.icon3')
 plist=ref('plist.info')
+launch=ref('resource.launchscreen')
 frameworks=['UIKit','Foundation','AVFoundation','WebKit','MobileCoreServices','QuartzCore']
 files=[('main.m',main,'sourcecode.c.objc','StreamPlayLegacy'),
        ('Info.plist',plist,'text.plist.xml','StreamPlayLegacy'),
+       ('LaunchScreen.storyboard',launch,'file.storyboard','StreamPlayLegacy'),
        ('AppIcon60x60@2x.png',icon2,'image.png','StreamPlayLegacy/Resources'),
        ('AppIcon60x60@3x.png',icon3,'image.png','StreamPlayLegacy/Resources')]
 
@@ -60,7 +62,7 @@ section('PBXGroup',[f'''\t\t{ref('group.root')} /* Root */ = {{
 \t\t}};
 \t\t{ref('group.src')} /* StreamPlayLegacy */ = {{
 \t\t\tisa = PBXGroup;
-\t\t\tchildren = ( {main} /* main.m */, {plist} /* Info.plist */, {ref('group.resources')} /* Resources */ );
+\t\t\tchildren = ( {main} /* main.m */, {plist} /* Info.plist */, {launch} /* LaunchScreen.storyboard */, {ref('group.resources')} /* Resources */ );
 \t\t\tpath = StreamPlayLegacy;
 \t\t\tsourceTree = "<group>";
 \t\t}};
@@ -112,7 +114,7 @@ section('PBXProject',[f'''\t\t{ref('project')} /* Project object */ = {{
 section('PBXResourcesBuildPhase',[f'''\t\t{ref('phase.resource')} /* Resources */ = {{
 \t\t\tisa = PBXResourcesBuildPhase;
 \t\t\tbuildActionMask = 2147483647;
-\t\t\tfiles = ({ref('build.AppIcon60x60@2x.png')} /* AppIcon60x60@2x.png in Resources */, {ref('build.AppIcon60x60@3x.png')} /* AppIcon60x60@3x.png in Resources */);
+\t\t\tfiles = ({ref('build.AppIcon60x60@2x.png')} /* AppIcon60x60@2x.png in Resources */, {ref('build.AppIcon60x60@3x.png')} /* AppIcon60x60@3x.png in Resources */, {ref('build.LaunchScreen.storyboard')} /* LaunchScreen.storyboard in Resources */);
 \t\t\trunOnlyForDeploymentPostprocessing = 0;
 \t\t}};'''])
 section('PBXSourcesBuildPhase',[f'''\t\t{ref('phase.source')} /* Sources */ = {{
@@ -134,8 +136,8 @@ base={'ALWAYS_SEARCH_USER_PATHS':'NO','CLANG_ENABLE_MODULES':'YES','CLANG_ENABLE
 settings={
  ('project','Debug'):base | {'GCC_OPTIMIZATION_LEVEL':'0','DEBUG_INFORMATION_FORMAT':'dwarf','ENABLE_TESTABILITY':'YES'},
  ('project','Release'):base | {'GCC_OPTIMIZATION_LEVEL':'s','DEBUG_INFORMATION_FORMAT':'"dwarf-with-dsym"','ENABLE_TESTABILITY':'NO'},
- ('target','Debug'):{'CODE_SIGN_STYLE':'Automatic','PRODUCT_BUNDLE_IDENTIFIER':'com.drotavio.streamplaylegacy','INFOPLIST_FILE':'StreamPlayLegacy/Info.plist','GENERATE_INFOPLIST_FILE':'NO','CURRENT_PROJECT_VERSION':'1','MARKETING_VERSION':'1.0','PRODUCT_NAME':'"$(TARGET_NAME)"','SDKROOT':'iphoneos','IPHONEOS_DEPLOYMENT_TARGET':'12.0','TARGETED_DEVICE_FAMILY':'1','SUPPORTED_PLATFORMS':'"iphoneos iphonesimulator"','ASSETCATALOG_COMPILER_APPICON_NAME':'""'},
- ('target','Release'):{'CODE_SIGN_STYLE':'Automatic','PRODUCT_BUNDLE_IDENTIFIER':'com.drotavio.streamplaylegacy','INFOPLIST_FILE':'StreamPlayLegacy/Info.plist','GENERATE_INFOPLIST_FILE':'NO','CURRENT_PROJECT_VERSION':'1','MARKETING_VERSION':'1.0','PRODUCT_NAME':'"$(TARGET_NAME)"','SDKROOT':'iphoneos','IPHONEOS_DEPLOYMENT_TARGET':'12.0','TARGETED_DEVICE_FAMILY':'1','SUPPORTED_PLATFORMS':'"iphoneos iphonesimulator"','ASSETCATALOG_COMPILER_APPICON_NAME':'""'},
+ ('target','Debug'):{'CODE_SIGN_STYLE':'Automatic','PRODUCT_BUNDLE_IDENTIFIER':'com.drotavio.streamplaylegacy','INFOPLIST_FILE':'StreamPlayLegacy/Info.plist','GENERATE_INFOPLIST_FILE':'NO','CURRENT_PROJECT_VERSION':'2','MARKETING_VERSION':'1.1','PRODUCT_NAME':'"$(TARGET_NAME)"','SDKROOT':'iphoneos','IPHONEOS_DEPLOYMENT_TARGET':'12.0','TARGETED_DEVICE_FAMILY':'1','SUPPORTED_PLATFORMS':'"iphoneos iphonesimulator"','ASSETCATALOG_COMPILER_APPICON_NAME':'""'},
+ ('target','Release'):{'CODE_SIGN_STYLE':'Automatic','PRODUCT_BUNDLE_IDENTIFIER':'com.drotavio.streamplaylegacy','INFOPLIST_FILE':'StreamPlayLegacy/Info.plist','GENERATE_INFOPLIST_FILE':'NO','CURRENT_PROJECT_VERSION':'2','MARKETING_VERSION':'1.1','PRODUCT_NAME':'"$(TARGET_NAME)"','SDKROOT':'iphoneos','IPHONEOS_DEPLOYMENT_TARGET':'12.0','TARGETED_DEVICE_FAMILY':'1','SUPPORTED_PLATFORMS':'"iphoneos iphonesimulator"','ASSETCATALOG_COMPILER_APPICON_NAME':'""'},
 }
 section('XCBuildConfiguration',[xcconfig(name,ref(f'xcconfig.{kind}.{name}'),settings[kind,name]) for kind in ('project','target') for name in ('Debug','Release')])
 section('XCConfigurationList',[f'''\t\t{ref('configlist.'+kind)} /* Build configuration list */ = {{
