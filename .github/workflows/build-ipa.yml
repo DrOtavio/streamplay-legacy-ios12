@@ -1,0 +1,31 @@
+name: Build StreamPlay Legacy iOS 12
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Choose Xcode 16.4
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+          xcodebuild -version
+      - name: Validate project
+        run: |
+          plutil -lint StreamPlayLegacy/Info.plist
+          plutil -lint StreamPlayLegacy.xcodeproj/project.pbxproj
+      - name: Build unsigned iOS 12 IPA
+        run: bash scripts/build-ipa.sh
+      - name: Verify minimum OS and architecture
+        run: |
+          /usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' .build/Build/Products/Release-iphoneos/StreamPlayLegacy.app/Info.plist
+          lipo -info .build/Build/Products/Release-iphoneos/StreamPlayLegacy.app/StreamPlayLegacy
+      - uses: actions/upload-artifact@v4
+        with:
+          name: StreamPlayLegacy-iOS12-IPA
+          path: dist/StreamPlayLegacy-iOS12-unsigned.ipa
+          if-no-files-found: error
